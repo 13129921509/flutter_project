@@ -53,6 +53,17 @@ class MyHomePageState extends State<MyHomePage>{
                 '$_count',
                 style: Theme.of(context).textTheme.display1,
             ),
+            FlatButton(
+              child: Text("open new router"),
+              textColor: Colors.blue,
+              onPressed: (){
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context){
+                    return new NewRouter();
+                  })
+                );
+              },
+            )
           ],
         ),
       ),
@@ -63,4 +74,21 @@ class MyHomePageState extends State<MyHomePage>{
       ),
     );
   }
+}
+
+
+class NewRouter extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Scaffold(
+      appBar: AppBar(
+        title: Text("New route"),
+      ),
+      body: Center(
+        child: Text("This is new router"),
+      ),
+    );
+  }
+
 }
