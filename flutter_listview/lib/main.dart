@@ -46,6 +46,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _words = <String>[loadingTag];
 
+  ScrollController _controller = new ScrollController();
+  bool showToTopBtn = false;
   static var loadingTag = "##loading##"; //表尾标记;
   @override
   Widget build(BuildContext context) {
@@ -80,16 +82,40 @@ class _MyHomePageState extends State<MyHomePage> {
             return ListTile(title: Text(_words[index]));
           },
           separatorBuilder: (context,index)=> Divider(height: 0),
-          itemCount: _words.length
+          itemCount: _words.length,
+        controller: _controller,
+      ),
+      floatingActionButton: !showToTopBtn?null:FloatingActionButton(
+        child: Icon(Icons.arrow_upward),
+        onPressed: (){
+          _controller.animateTo(.0, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        },
       ),
     );
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _retrieveData();
+    _controller.addListener((){
+      if(_controller.offset < 1000 && showToTopBtn){
+        setState(() {
+          showToTopBtn = false;
+        });
+      }else if(_controller.offset >= 1000 && showToTopBtn == false){
+        setState(() {
+          showToTopBtn = true;
+        });
+      }
+    });
   }
 
   void _retrieveData() {
