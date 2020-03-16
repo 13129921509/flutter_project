@@ -4,6 +4,8 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  DateTime _lastPressAt;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +22,30 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          verticalDirection: VerticalDirection.up,
+          children: <Widget>[
+            WillPopScope(
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('1秒内连续按两次返回键退出'),
+                ),
+                onWillPop: () async {
+                  if(_lastPressAt == null || DateTime.now().difference(_lastPressAt) > Duration(seconds: 1)){
+                    _lastPressAt = DateTime.now();
+                    return false;
+                  }
+                  return true;
+                }
+            ),
+            MyHomePage(title: 'Flutter Demo Home Page'),
+          ],
+        ),
+      )
     );
   }
 }
@@ -49,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ScrollController _controller = new ScrollController();
   bool showToTopBtn = false;
   static var loadingTag = "##loading##"; //表尾标记;
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -57,34 +83,34 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('lIST Demo'),
       ),
       body: ListView.separated(
-          itemBuilder: (context, index){
-            if(_words[index] == loadingTag){
-              if(_words.length-1 < 100){
-                _retrieveData();
-                return Container(
-                  padding: EdgeInsets.all(12),
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2,),
-                  ),
-                );
-              }else{
-                return Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(16),
-                  child: Text("没有更多了", style: TextStyle(color: Colors.grey),),
-                );
-              }
-            }
-            return ListTile(title: Text(_words[index]));
-          },
-          separatorBuilder: (context,index)=> Divider(height: 0),
-          itemCount: _words.length,
-        controller: _controller,
-      ),
+              itemBuilder: (context, index){
+                if(_words[index] == loadingTag){
+                  if(_words.length-1 < 100){
+                    _retrieveData();
+                    return Container(
+                      padding: EdgeInsets.all(12),
+                      alignment: Alignment.center,
+                      child: SizedBox(
+
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2,),
+                      ),
+                    );
+                  }else{
+                    return Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(16),
+                      child: Text("没有更多了", style: TextStyle(color: Colors.grey),),
+                    );
+                  }
+                }
+                return ListTile(title: Text(_words[index]));
+              },
+              separatorBuilder: (context,index)=> Divider(height: 0),
+              itemCount: _words.length,
+              controller: _controller,
+            ),
       floatingActionButton: !showToTopBtn?null:FloatingActionButton(
         child: Icon(Icons.arrow_upward),
         onPressed: (){
